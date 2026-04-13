@@ -1,18 +1,39 @@
 import 'dotenv/config'
-import { randomUUID } from 'node:crypto'
 import { execSync } from 'node:child_process'
-import { PrismaClient } from '../../generated/prisma'
+import path from 'node:path'
+import { PrismaPg } from '@prisma/adapter-pg'
 
-const prisma = new PrismaClient()
+// Resolve generated client from project root even when this package is npm-linked.
+const { PrismaClient } = require(path.resolve(process.cwd(), 'generated/prisma'))
+const defaultLocalTestDatabaseUrl = 'postgresql://docker:docker@localhost:5432/apisolid?schema=public'
+
+const baseDatabaseUrl =
+  process.env.TEST_DIRECT_URL ??
+  process.env.TEST_DATABASE_URL ??
+  (process.env.NODE_ENV === 'test'
+    ? defaultLocalTestDatabaseUrl
+    : process.env.DIRECT_URL ?? process.env.DATABASE_URL)
+
+if (!baseDatabaseUrl) {
+  throw new Error('Please provide DIRECT_URL or DATABASE_URL environment variable.')
+}
+
+const prisma = new PrismaClient({
+  adapter: new PrismaPg({ connectionString: baseDatabaseUrl }),
+})
+
+const globalForE2E = globalThis as typeof globalThis & {
+  __e2eMigrationsApplied?: boolean
+}
 
 function generateDatabaseURL(schema: string) {
   // schema public é o schema primário
 
-  if(!process.env.DATABASE_URL) {
-    throw new Error('Please provide a DATABASE_URL environment variable.')
+  if (!baseDatabaseUrl) {
+    throw new Error('Please provide DIRECT_URL or DATABASE_URL environment variable.')
   }
 
-  const url = new URL(process.env.DATABASE_URL)
+  const url = new URL(baseDatabaseUrl)
 
   url.searchParams.set('schema', schema)
 
@@ -24,19 +45,24 @@ export default {
   transformMode: 'ssr',
   // método setup é executado antes de cada teste
   async setup() {
-    const schema = randomUUID()
-    const databaseUrl = generateDatabaseURL(schema)
+    const publicDatabaseUrl = generateDatabaseURL('public')
 
-    process.env.DATABASE_URL = databaseUrl
+    process.env.DATABASE_URL = publicDatabaseUrl
+    process.env.DIRECT_URL = publicDatabaseUrl
 
-    execSync('npx prisma migrate deploy') // utilizando deploy ao invés do dev para pular as etapas de comparação
+    if (!globalForE2E.__e2eMigrationsApplied) {
+      execSync('npx prisma migrate deploy', { stdio: 'ignore' })
+      globalForE2E.__e2eMigrationsApplied = true
+    }
+
+    await prisma.$executeRawUnsafe(
+      'TRUNCATE TABLE "check_ins", "gyms", "users" RESTART IDENTITY CASCADE',
+    )
 
     return {
       // método teardown executa após o encerramento dos testes
       async teardown() {
-        await prisma.$executeRawUnsafe(`DROP SCHEMA IF EXISTS "${schema}" CASCADE`)
         await prisma.$disconnect()
-        // cascade elimina tudo o que for criado junto com o schema
       }
     }
   },

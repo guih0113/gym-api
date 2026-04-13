@@ -9,6 +9,8 @@ const alias = {
 export default defineConfig({
   plugins: [tsconfigPaths()],
   test: {
+    maxWorkers: 1,
+    minWorkers: 1,
     projects: [
       {
         test: {

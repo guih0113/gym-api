@@ -5,6 +5,7 @@ const envSchema = z.object({
   NODE_ENV: z.enum(['dev', 'test', 'production']).default('dev'),
   JWT_SECRET: z.string(),
   DATABASE_URL: z.string().optional(),
+  DIRECT_URL: z.string().optional(),
   PRISMA_ACCELERATE_URL: z.string().optional(),
   PORT: z.coerce.number().default(3333),
 })

@@ -5,10 +5,8 @@ info:
   description: |
     API para gerenciamento de academias e check-ins, construída com princípios SOLID
 servers:
-  - url: https://api-solid-03.vercel.app
-    description: Servidor de Produção (Vercel)
-  - url: http://localhost:3333
-    description: Servidor local
+  - url: /
+    description: Servidor atual (mesma origem)
 tags:
   - name: Rotas
     description: Todas as rotas da aplicação

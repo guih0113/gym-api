@@ -88,6 +88,49 @@ npx prisma migrate deploy
 npm start
 ```
 
+## Deploy na Vercel (API Serverless)
+
+1. No painel da Vercel, clique em **Add New > Project** e importe este repositório.
+2. Confirme que o deploy está usando o `vercel.json` com a função `api/index.ts` (entrypoint serverless).
+3. Configure as variáveis de ambiente do projeto:
+   - `NODE_ENV=production`
+   - `JWT_SECRET=<seu-segredo-forte>`
+   - `DATABASE_URL=<string pooled do Neon>` (runtime da API)
+   - `DIRECT_URL=<string direct do Neon>` (migrations)
+4. Execute o deploy (Production) pela Vercel.
+5. Após o deploy, valide:
+   - documentação em `/docs`
+   - autenticação (`POST /sessions`)
+   - leitura de perfil (`GET /me`)
+   - rotas principais de academias e check-ins
+
+## Deploy do banco (Neon - plano gratuito)
+
+1. Crie uma conta em [Neon](https://neon.tech) e inicie um novo projeto.
+2. Crie o banco e um usuário de aplicação (evite usar o usuário admin no app).
+3. Copie as duas strings de conexão:
+   - pooled (para `DATABASE_URL`)
+   - direct (para `DIRECT_URL`)
+4. Com as variáveis de produção configuradas, execute as migrations em um ambiente controlado (CI/CD ou sua máquina local com o `.env` de produção):
+
+```bash
+npx prisma migrate deploy
+```
+
+5. Valide o status das migrations:
+
+```bash
+npx prisma migrate status
+```
+
+6. Valide no dashboard da Neon se as tabelas e migrations (incluindo `_prisma_migrations`) foram aplicadas corretamente.
+
+Boas práticas
+
+- Não registre URLs de conexão em logs.
+- Separe credenciais de desenvolvimento e produção.
+- Monitore os limites do plano gratuito (compute, armazenamento e conexões).
+
 API — Endpoints principais
 
 Autenticação

@@ -12,8 +12,8 @@
     "test": "vitest run src/use-cases",
     "test:watch": "vitest src/use-cases",
     "pretest:e2e": "run-s test:create-prisma-environment test:install-prisma-environment",
-    "test:e2e": "vitest run src/http/controllers",
-    "test:e2e:watch": "vitest src/http/controllers",
+    "test:e2e": "cross-env NODE_ENV=test vitest run src/http/controllers",
+    "test:e2e:watch": "cross-env NODE_ENV=test vitest src/http/controllers",
     "test:coverage": "vitest run --coverage",
     "test:ui": "vitest --ui"
   },
@@ -44,13 +44,16 @@
     "@fastify/jwt": "9.1.0",
     "@fastify/swagger": "9.5.1",
     "@fastify/swagger-ui": "5.2.3",
+    "@prisma/adapter-pg": "^7.7.0",
     "@prisma/client": "7.2.0",
     "@vercel/node": "5.5.16",
     "bcryptjs": "3.0.2",
     "dayjs": "1.11.13",
     "decimal.js": "10.5.0",
     "dotenv": "16.5.0",
+    "cross-env": "7.0.3",
     "fastify": "5.4.0",
+    "pg": "^8.20.0",
     "zod": "3.25.67"
   }
 }

@@ -1,6 +1,6 @@
 import { getDistanceBetweenCoordinates } from '@/utils/get-distance-between-coordinates'
 import Decimal from 'decimal.js'
-import { Gym, Prisma } from 'generated/prisma'
+import { Gym, Prisma } from '@prisma/client'
 import { randomUUID } from 'node:crypto'
 import { FindManyNearbyParams, GymsRepository } from '../gyms-repository'
 

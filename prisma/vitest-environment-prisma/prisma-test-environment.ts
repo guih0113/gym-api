@@ -1,10 +1,8 @@
 import 'dotenv/config'
 import { execSync } from 'node:child_process'
-import path from 'node:path'
 import { PrismaPg } from '@prisma/adapter-pg'
+import { PrismaClient } from '@prisma/client'
 
-// Resolve generated client from project root even when this package is npm-linked.
-const { PrismaClient } = require(path.resolve(process.cwd(), 'generated/prisma'))
 const defaultLocalTestDatabaseUrl = 'postgresql://docker:docker@localhost:5432/apisolid?schema=public'
 
 const baseDatabaseUrl =

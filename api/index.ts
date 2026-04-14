@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { app } from '../src/app'
+import { app } from '../build/app.js'
 
 let appReadyPromise: Promise<void> | null = null
 

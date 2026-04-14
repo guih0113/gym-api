@@ -10,3 +10,4 @@ coverage
 src/**/*.spec.ts
 prisma/vitest-environment-prisma
 README.md
+api
